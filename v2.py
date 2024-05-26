@@ -1,23 +1,32 @@
 import pygame
 import time
 
+
 class Main:
     def __init__(self, screen):
         self.running = True
         self.screen = screen
         self.clock = pygame.time.Clock()
         self.devTool = False
+        self.player = Player()
+    # DevTools (Remove after beta)
     def devTools(self):
-        pressed = pygame.key.get_pressed()
-        if pressed[pygame.K_F1]:
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_F1]:
             self.devTool = True
-        if pressed[pygame.K_F2]:
+        if keys[pygame.K_F2]:
             self.devTool = False
+    def display(self):
+        self.player.display(self.screen)
+#    def move(self):
+#
     def run(self):
         devTool = self.devTools()
         while self.running:
             screen.fill((0,0,0))
             self.devTools()
+            self.display()
+            self.player.move()
             if self.devTool:
                 mousex, mousey = pygame.mouse.get_pos()
                 font = pygame.font.Font(None, 46)
@@ -31,7 +40,31 @@ class Main:
 
 class Player:
     def __init__(self) -> None:
-        pass
+        self.test = True
+        self.player = pygame.image.load("monkey.png")
+        self.velocity = [0, 0] # X, Y
+        self.speed = 5
+        self.position = [0, 0]
+    def display(self, screen):
+        screen.blit(self.player, self.position)
+    def move(self):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT]:
+            self.velocity[0] = -1
+        elif keys[pygame.K_RIGHT]:
+            self.velocity[0] = 1
+        else:
+            self.velocity[0] = 0
+
+        if keys[pygame.K_UP]:
+            self.velocity[1] = -1
+        elif keys[pygame.K_DOWN]:
+            self.velocity[1] = 1
+        else:
+            self.velocity[1] = 0
+
+        self.position[0] += self.velocity[0] * self.speed
+        self.position[1] += self.velocity[1] * self.speed
 
 
 
