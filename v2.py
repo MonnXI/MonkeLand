@@ -27,6 +27,7 @@ class Main:
             self.display()
             self.player.move()
             self.player.borders()
+            # DevTools actions
             if self.devTool:
                 mousex, mousey = pygame.mouse.get_pos()
                 font = pygame.font.Font(None, 46)
@@ -34,9 +35,14 @@ class Main:
                 screen.blit(mousePos, (25, 25))
                 self.cursor = pygame.Surface((10, 10))
                 self.cursor.fill((255, 255, 255))
-                self.bulletMask = pygame.mask.from_surface(self.cursor) 
+                self.cursorMask = pygame.mask.from_surface(self.cursor) 
                 self.pos = pygame.mouse.get_pos()
                 screen.blit(self.cursor, self.pos)
+                self.offset = (self.pos[0] - self.player.position[0], self.pos[1] - self.player.position[1])
+                if self.player.mask.overlap(self.cursorMask, self.offset):
+                    self.cursor.fill((255, 0, 0))
+                    screen.blit(self.cursor, self.pos)
+            # DevTool End
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
@@ -51,6 +57,10 @@ class Player:
         self.speed = 15
         self.position = [0, 0]
         self.mask = pygame.mask.from_surface(self.player)
+        self.topLeft = self.position
+        self.topRight = [self.position[0] - 64, self.position[1]]
+        self.bottomLeft = [self.position[0], self.position[1] - 128]
+        self.bottomRight = [self.position[0] - 64, self.position[1] - 128]
     def display(self, screen):
         screen.blit(self.player, self.position)
     def move(self):
