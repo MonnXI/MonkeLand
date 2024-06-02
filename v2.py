@@ -2,14 +2,18 @@ import pygame
 from pygame.locals import *
 import time
 
+pause = False
 
 class Main:
     def __init__(self, screen):
+        global pause
+        self.pause = pause
         self.running = True
         self.screen = screen
         self.clock = pygame.time.Clock()
         self.devTool = False
         self.player = Player()
+        self.menu = Menu()
     # DevTools (Remove after beta)
     def devTools(self):
         keys = pygame.key.get_pressed()
@@ -24,9 +28,11 @@ class Main:
         while self.running:
             screen.fill((0,0,0))
             self.devTools()
-            self.display()
-            self.player.move()
-            self.player.borders()
+            if not self.pause:
+                self.display()
+                self.player.move()
+                self.player.borders()
+            self.menu.open(self.screen, self.pause)
             # DevTools actions
             if self.devTool:
                 mousex, mousey = pygame.mouse.get_pos()
@@ -42,19 +48,25 @@ class Main:
                 if self.player.mask.overlap(self.cursorMask, self.offset):
                     self.cursor.fill((255, 0, 0))
                     screen.blit(self.cursor, self.pos)
+                keys = pygame.key.get_pressed()
+                if keys[pygame.K_F3]:
+                    print(time.ctime())
             # DevTool End
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
+                elif event.type == pygame.KEYDOWN: 
+                    if event.key == pygame.K_ESCAPE: 
+                        self.pause = not self.pause
             pygame.display.flip()
-            self.clock.tick(30)
+            self.clock.tick(60)
 
 class Player:
     def __init__(self) -> None:
         self.test = True
         self.player = pygame.image.load("monkey.png")
         self.velocity = [0, 0] # X, Y
-        self.speed = 15
+        self.speed = 10
         self.position = [0, 0]
         self.mask = pygame.mask.from_surface(self.player)
         self.topLeft = self.position
@@ -85,15 +97,20 @@ class Player:
         if self.position[0] <= 0:
             self.position[0] = 0
         if self.position[0] >= 1080 - 64:
-            self.position[0] = 1080 -64
+            self.position[0] = 1080 - 64
         if self.position[1] <= 0:
             self.position[1] = 0
         if self.position[1] >= 720 - 128:
             self.position[1] = 720 - 128
     def hitbox(self):
         return self.mask.get_bounding_rects()[0].move(self.position)
-
-
+    
+class Menu:
+    def __init__(self) -> None:
+        self.menuBackground = pygame.image.load("menu.png")
+    def open(self, screen, pause):
+        if pause:
+            screen.blit(self.menuBackground, (0, 0))
 
 pygame.init()
 
