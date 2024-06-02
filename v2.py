@@ -1,5 +1,6 @@
 import pygame
 from pygame.locals import *
+import sys
 import time
 
 pause = False
@@ -32,12 +33,17 @@ class Main:
                 self.display()
                 self.player.move()
                 self.player.borders()
-            self.menu.open(self.screen, self.pause)
+            else:
+                self.menu.open(self.screen, self.pause)
             # DevTools actions
             if self.devTool:
                 mousex, mousey = pygame.mouse.get_pos()
                 font = pygame.font.Font(None, 46)
                 mousePos = font.render(f'{mousex}, {mousey}', True, (255, 255, 255))
+                self.clock.tick(70)
+                fps = str(int(self.clock.get_fps()))
+                fpsRender = font.render(f"{fps} FPS", True, (255, 255, 255))
+                screen.blit(fpsRender, (540, 25))
                 screen.blit(mousePos, (25, 25))
                 self.cursor = pygame.Surface((10, 10))
                 self.cursor.fill((255, 255, 255))
@@ -59,7 +65,6 @@ class Main:
                     if event.key == pygame.K_ESCAPE: 
                         self.pause = not self.pause
             pygame.display.flip()
-            self.clock.tick(60)
 
 class Player:
     def __init__(self) -> None:
